@@ -1,0 +1,31 @@
+//#define HOLOMORPHIC_MAP  
+#define LINES  
+#define dt .01
+#define SCALE 5.
+
+vec2 holomap(vec2 uv) {
+    return vec2(uv.x * uv.x - uv.y * uv.y, 2. * uv.x * uv.y);
+}
+
+float df(float x) {
+    return ((x + dt) - (x - dt)) / (2.0 * dt);
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 uv = (3. + sin(iTime / 15.) * 2.) * (2. * fragCoord - iResolution.xy) / iResolution.y;
+    #ifdef HOLOMORPHIC_MAP
+    uv = holomap(uv);  
+    #endif
+    uv.x -= .4 * iTime; 
+    uv.y += .4 * iTime;
+    vec2 sine_uv = sin(vec2((uv.x + uv.y) * (.5 * uv.x - uv.y), uv.x / (df(uv.x + uv.y))));
+    vec2 jacobian = fwidth(sine_uv);
+    #ifdef LINES
+    jacobian = holomap(cross(vec3(df(sine_uv.x), df(sine_uv.y), sine_uv.x), vec3(dFdx(sine_uv.x), dFdx(sine_uv.y), sine_uv.y)).xz);
+    sine_uv = (holomap(vec2(dot(uv, sine_uv), dot(jacobian, uv))));
+    #endif
+    vec2 uv_aa = smoothstep(-1., 1., sine_uv); 
+    uv_aa = 2. * uv_aa - 1.;  // Remap to [-1;1]
+    float checkerboard = .5 * uv_aa.x * uv_aa.y + .5; 
+    fragColor.rgb = vec3((checkerboard));
+}
