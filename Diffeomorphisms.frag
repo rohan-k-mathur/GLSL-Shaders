@@ -1,4 +1,4 @@
-//A fork of etale_cohomology's 'Diffeomorphisms of the disk'
+//A fork of etale_cohomology's 'Diffeomorphisms of the disk' 
 #define TWIST 3.5
 #define STRIPES 75.
 #define STRIPE_THINNESS 2.
@@ -59,7 +59,7 @@ float scene(vec3 p, float r) {
 float raymarch(vec3 ro, vec3 rd, float r) {
     float d = 0.001;
 
-    for (int i = 0; i < 128; i++) {
+    for (int i = 0; i < 512; i++) {
         vec3 p = ro + rd * d;
         float h = scene(p, r);
         d += h * 0.45;
